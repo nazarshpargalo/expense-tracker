@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+    prod:
+        build:
+            dockerfile: Dockerfile
+            target: production
+            context: .
+        environment:
+            DATABASE_HOST: ${DATABASE_HOST}
+            DATABASE_USERNAME: ${DATABASE_USERNAME}
+            DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+            DATABASE_NAME: ${DATABASE_NAME}
+            PORT: ${PORT}
+        depends_on:
+            - postgres
+        ports:
+            - "${PORT}:${PORT}"
+        restart: unless-stopped
+
+    postgres:
+        image: postgres:14.1
+        expose:
+            - "${DATABASE_PORT}"
+        ports:
+            - "${DATABASE_PORT}:${DATABASE_PORT}"
+        environment:
+            POSTGRES_USER: ${DATABASE_USERNAME}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+            POSTGRES_DB: ${DATABASE_NAME}
+        command: -p ${DATABASE_PORT}
+        volumes:
+            - data:/var/lib/postgresql/data
+
+volumes:
+    data:
