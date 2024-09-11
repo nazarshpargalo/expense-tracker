@@ -41,4 +41,4 @@ jobs:
           service: expenses-tracker-service
           cluster: expenses-tracker-cluster-2
           wait-for-service-stability: true
-          task-definition: './ecs/task-def.json'   # Update this to your file path
+          task-definition: '../../ecs/task-def.json'   # Update this to your file path
