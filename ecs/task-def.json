@@ -48,8 +48,9 @@
     "volumes": [
       {
         "name": "db-data",
-        "host": {
-          "sourcePath": "/efs/db-data"
+        "efsVolumeConfiguration": {
+          "fileSystemId": "your-efs-filesystem-id",
+          "transitEncryption": "ENABLED"
         }
       }
     ],
