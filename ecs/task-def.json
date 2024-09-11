@@ -1,5 +1,6 @@
 {
     "family": "expenses-tracker-definition",
+    "executionRoleArn": "arn:aws:iam::442474044593:role/ecsTaskExecutionRole",
     "containerDefinitions": [
       {
         "name": "expenses-tracker",
