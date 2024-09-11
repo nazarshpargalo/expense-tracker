@@ -49,7 +49,7 @@
       {
         "name": "db-data",
         "efsVolumeConfiguration": {
-          "fileSystemId": "your-efs-filesystem-id",
+          "fileSystemId": "fs-09c30d971ad696c12",
           "transitEncryption": "ENABLED"
         }
       }
