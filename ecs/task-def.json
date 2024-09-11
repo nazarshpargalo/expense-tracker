@@ -4,7 +4,7 @@
     "containerDefinitions": [
       {
         "name": "expenses-tracker",
-        "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest",
+        "image": "442474044593.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest",
         "portMappings": [
           {
             "containerPort": 5000,
