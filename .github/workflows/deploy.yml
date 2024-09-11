@@ -1,0 +1,72 @@
+name: CI/CD to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push the Docker image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG .
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update ECS service with new image
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          service: expenses-tracker-service
+          cluster: expenses-tracker-cluster-2
+          wait-for-service-stability: true
+          task-definition: |
+            family: expenses-tracker
+            containerDefinitions: |
+              [
+                {
+                  "name": "expenses-tracker",
+                  "image": "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}",
+                  "portMappings": [
+                    {
+                      "containerPort": 5000,
+                      "hostPort": 5000
+                    }
+                  ],
+                  "essential": true,
+                  "environment": [
+                    {
+                      "name": "DATABASE_HOST",
+                      "value": "${{ secrets.DATABASE_HOST }}"
+                    },
+                    {
+                      "name": "DATABASE_USERNAME",
+                      "value": "${{ secrets.DATABASE_USERNAME }}"
+                    },
+                    {
+                      "name": "DATABASE_PASSWORD",
+                      "value": "${{ secrets.DATABASE_PASSWORD }}"
+                    },
+                    {
+                      "name": "DATABASE_NAME",
+                      "value": "${{ secrets.DATABASE_NAME }}"
+                    },
+                    {
+                      "name": "PORT",
+                      "value": "${{ secrets.PORT }}"
+                    }
+                  ]
+                }
+              ]
