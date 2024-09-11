@@ -41,47 +41,4 @@ jobs:
           service: expenses-tracker-service
           cluster: expenses-tracker-cluster-2
           wait-for-service-stability: true
-          task-definition: |
-            {
-              "family": "expenses-tracker-definition",
-              "containerDefinitions": [
-                {
-                  "name": "expenses-tracker-definition",
-                  "image": "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}",
-                  "portMappings": [
-                    {
-                      "containerPort": 5000,
-                      "hostPort": 5000,
-                      "protocol": "tcp"
-                    }
-                  ],
-                  "essential": true,
-                  "environment": [
-                    {
-                      "name": "DATABASE_HOST",
-                      "value": "${{ secrets.DATABASE_HOST }}"
-                    },
-                    {
-                      "name": "DATABASE_USERNAME",
-                      "value": "${{ secrets.DATABASE_USERNAME }}"
-                    },
-                    {
-                      "name": "DATABASE_PASSWORD",
-                      "value": "${{ secrets.DATABASE_PASSWORD }}"
-                    },
-                    {
-                      "name": "DATABASE_NAME",
-                      "value": "${{ secrets.DATABASE_NAME }}"
-                    },
-                    {
-                      "name": "PORT",
-                      "value": "5000"
-                    }
-                  ]
-                }
-              ],
-              "requiresCompatibilities": ["FARGATE"],
-              "networkMode": "awsvpc",
-              "cpu": "512",
-              "memory": "1024"
-            }
+          task-definition: './ecs/task-def.json'   # Update this to your file path
