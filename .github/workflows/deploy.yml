@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy to AWS Fargate
 
 on:
   push:
@@ -6,25 +6,31 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Configure AWS Credentials
+      # Step 3: Configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Step 4: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Step 5: Build and tag Docker images
       - name: Build and tag Docker image
         run: |
           IMAGE_TAG=${{ github.sha }}
@@ -32,15 +38,13 @@ jobs:
           docker tag ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
+      # Step 6: Push Docker images to Amazon ECR
       - name: Push Docker image to Amazon ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
 
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          service: expenses-tracker-service
-          cluster: expenses-tracker-cluster-2
-          wait-for-service-stability: true
-          task-definition: './ecs/task-def.json'
+      # Step 7: Deploy using Docker Compose to Fargate
+      - name: Deploy to AWS Fargate using Docker Compose
+        run: |
+          docker compose -f ./docker-compose.yml up
