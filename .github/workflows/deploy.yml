@@ -47,7 +47,7 @@ jobs:
           cluster: expenses-tracker-cluster-2
           wait-for-service-stability: true
           task-definition: |
-            family: expenses-tracker
+            family: expenses-tracker-definition
             containerDefinitions: |
               [
                 {
