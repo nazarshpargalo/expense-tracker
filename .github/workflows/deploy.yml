@@ -46,7 +46,7 @@ jobs:
               "family": "expenses-tracker-definition",
               "containerDefinitions": [
                 {
-                  "name": "expenses-tracker",
+                  "name": "expenses-tracker-definition",
                   "image": "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}",
                   "portMappings": [
                     {
