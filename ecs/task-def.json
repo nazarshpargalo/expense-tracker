@@ -14,27 +14,43 @@
         ],
         "essential": true,
         "environment": [
+          { "name": "DATABASE_HOST", "value": "postgres" },
+          { "name": "DATABASE_USERNAME", "value": "${DATABASE_USERNAME}" },
+          { "name": "DATABASE_PASSWORD", "value": "${DATABASE_PASSWORD}" },
+          { "name": "DATABASE_NAME", "value": "${DATABASE_NAME}" },
+          { "name": "PORT", "value": "5000" }
+        ]
+      },
+      {
+        "name": "postgres",
+        "image": "postgres:14.1",
+        "portMappings": [
           {
-            "name": "DATABASE_HOST",
-            "value": "your-database-host"
-          },
+            "containerPort": 5432,
+            "hostPort": 5432,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true,
+        "environment": [
+          { "name": "POSTGRES_USER", "value": "${DATABASE_USERNAME}" },
+          { "name": "POSTGRES_PASSWORD", "value": "${DATABASE_PASSWORD}" },
+          { "name": "POSTGRES_DB", "value": "${DATABASE_NAME}" }
+        ],
+        "mountPoints": [
           {
-            "name": "DATABASE_USERNAME",
-            "value": "your-database-username"
-          },
-          {
-            "name": "DATABASE_PASSWORD",
-            "value": "your-database-password"
-          },
-          {
-            "name": "DATABASE_NAME",
-            "value": "your-database-name"
-          },
-          {
-            "name": "PORT",
-            "value": "5000"
+            "sourceVolume": "db-data",
+            "containerPath": "/var/lib/postgresql/data"
           }
         ]
+      }
+    ],
+    "volumes": [
+      {
+        "name": "db-data",
+        "host": {
+          "sourcePath": "/efs/db-data"
+        }
       }
     ],
     "requiresCompatibilities": ["FARGATE"],
