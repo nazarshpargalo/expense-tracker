@@ -48,3 +48,10 @@ jobs:
       - name: Deploy to AWS Fargate using Docker Compose
         run: |
           docker compose -f ./docker-compose.yml up
+        env:
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          PORT: ${{ secrets.PORT }}
