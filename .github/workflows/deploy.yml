@@ -1,4 +1,4 @@
-name: CI/CD to AWS ECS
+name: CI/CD Pipeline
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}  # Set region here
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
@@ -35,28 +35,24 @@ jobs:
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
 
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update ECS service with new image
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           service: expenses-tracker-service
           cluster: expenses-tracker-cluster-2
           wait-for-service-stability: true
           task-definition: |
-            family: expenses-tracker-definition
-            containerDefinitions: |
-              [
+            {
+              "family": "expenses-tracker-definition",
+              "containerDefinitions": [
                 {
                   "name": "expenses-tracker",
                   "image": "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}",
                   "portMappings": [
                     {
                       "containerPort": 5000,
-                      "hostPort": 5000
+                      "hostPort": 5000,
+                      "protocol": "tcp"
                     }
                   ],
                   "essential": true,
@@ -79,8 +75,13 @@ jobs:
                     },
                     {
                       "name": "PORT",
-                      "value": "${{ secrets.PORT }}"
+                      "value": "5000"
                     }
                   ]
                 }
-              ]
+              ],
+              "requiresCompatibilities": ["FARGATE"],
+              "networkMode": "awsvpc",
+              "cpu": "512",
+              "memory": "1024"
+            }
