@@ -40,6 +40,12 @@ jobs:
       # Step 6: Push Docker images to Amazon ECR
       - name: Push Docker images to Amazon ECR
         run: |
+          IMAGE_TAG=${{ github.sha }}
+          echo "Pushing Docker images..."
+          echo "AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}"
+          echo "IMAGE_TAG=${IMAGE_TAG}"
+          
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
 

@@ -1,62 +1,61 @@
 {
-    "family": "expenses-tracker-definition",
-    "executionRoleArn": "arn:aws:iam::442474044593:role/ecsTaskExecutionRole",
-    "containerDefinitions": [
-      {
-        "name": "expenses-tracker",
-        "image": "442474044593.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest",
-        "portMappings": [
-          {
-            "containerPort": 5000,
-            "hostPort": 5000,
-            "protocol": "tcp"
-          }
-        ],
-        "essential": true,
-        "environment": [
-          { "name": "DATABASE_HOST", "value": "localhost" },
-          { "name": "DATABASE_USERNAME", "value": "${DATABASE_USERNAME}" },
-          { "name": "DATABASE_PASSWORD", "value": "${DATABASE_PASSWORD}" },
-          { "name": "DATABASE_NAME", "value": "${DATABASE_NAME}" },
-          { "name": "PORT", "value": "5000" }
-        ]
-      },
-      {
-        "name": "postgres",
-        "image": "postgres:14.1",
-        "portMappings": [
-          {
-            "containerPort": 5432,
-            "hostPort": 5432,
-            "protocol": "tcp"
-          }
-        ],
-        "essential": true,
-        "environment": [
-          { "name": "POSTGRES_USER", "value": "${DATABASE_USERNAME}" },
-          { "name": "POSTGRES_PASSWORD", "value": "${DATABASE_PASSWORD}" },
-          { "name": "POSTGRES_DB", "value": "${DATABASE_NAME}" }
-        ],
-        "mountPoints": [
-          {
-            "sourceVolume": "db-data",
-            "containerPath": "/var/lib/postgresql/data"
-          }
-        ]
-      }
-    ],
-    "volumes": [
-      {
-        "name": "db-data",
-        "efsVolumeConfiguration": {
-          "fileSystemId": "fs-09c30d971ad696c12",
-          "transitEncryption": "ENABLED"
+  "family": "expenses-tracker-definition",
+  "executionRoleArn": "arn:aws:iam::442474044593:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "expenses-tracker",
+      "image": "442474044593.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 5000,
+          "protocol": "tcp"
         }
+      ],
+      "essential": true,
+      "environment": [
+        { "name": "DATABASE_HOST", "value": "localhost" },
+        { "name": "DATABASE_USERNAME", "value": "${DATABASE_USERNAME}" },
+        { "name": "DATABASE_PASSWORD", "value": "${DATABASE_PASSWORD}" },
+        { "name": "DATABASE_NAME", "value": "${DATABASE_NAME}" },
+        { "name": "PORT", "value": "5000" }
+      ]
+    },
+    {
+      "name": "postgres",
+      "image": "postgres:14.1",
+      "portMappings": [
+        {
+          "containerPort": 5432,
+          "hostPort": 5432,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        { "name": "POSTGRES_USER", "value": "${DATABASE_USERNAME}" },
+        { "name": "POSTGRES_PASSWORD", "value": "${DATABASE_PASSWORD}" },
+        { "name": "POSTGRES_DB", "value": "${DATABASE_NAME}" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "db-data",
+          "containerPath": "/var/lib/postgresql/data"
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "db-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-09c30d971ad696c12",
+        "transitEncryption": "ENABLED"
       }
-    ],
-    "requiresCompatibilities": ["FARGATE"],
-    "networkMode": "awsvpc",
-    "cpu": "512",
-    "memory": "1024"
-  }
-  
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "512",
+  "memory": "1024"
+}
