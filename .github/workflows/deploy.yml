@@ -30,16 +30,12 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      # Step 5: Build and tag Docker images for both containers
+      # Step 5: Build and tag Docker images
       - name: Build and tag Docker images
         run: |
           IMAGE_TAG=${{ github.sha }}
-
-          # Build the app (expenses-tracker) container
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG .
           docker tag ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
-
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       # Step 6: Push Docker images to Amazon ECR
       - name: Push Docker images to Amazon ECR
@@ -47,13 +43,12 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
 
-      # Step 7: Update ECS task definition and replace image URI in ecs/task-def.json
+      # Step 7: Update ECS task definition
       - name: Update ECS task definition
         run: |
-          # Replace the image URI with the new image tag in ecs/task-def.json
           sed -i 's|442474044593.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest|${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}|' ecs/task-def.json
 
-      # Step 8: Register updated ECS task definition
+      # Step 8: Register ECS task definition
       - name: Register ECS task definition
         run: |
           aws ecs register-task-definition --cli-input-json file://ecs/task-def.json
