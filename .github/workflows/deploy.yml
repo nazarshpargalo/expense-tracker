@@ -55,4 +55,4 @@ jobs:
       # Step 8: Deploy ECS service
       - name: Deploy ECS service
         run: |
-          aws ecs update-service --cluster expenses-tracker-cluster-2 --service expenses-tracker-service --task-definition your-task-family-name:10 --force-new-deployment
+          aws ecs update-service --cluster expenses-tracker-cluster-2 --service expenses-tracker-service --task-definition expenses-tracker-definition:12 --force-new-deployment
