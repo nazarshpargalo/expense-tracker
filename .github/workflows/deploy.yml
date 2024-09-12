@@ -30,36 +30,29 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      # Step 5: Build and tag Docker images
-      - name: Build and tag Docker images
+      # Step 5: Build and push multi-architecture Docker images
+      - name: Build and push multi-architecture Docker images
         run: |
           IMAGE_TAG=${{ github.sha }}
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG .
-          docker tag ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
+          echo "Building multi-architecture Docker images..."
 
-      # Step 6: Push Docker images to Amazon ECR
-      - name: Push Docker images to Amazon ECR
-        run: |
-          IMAGE_TAG=${{ github.sha }}
-          echo "Pushing Docker images..."
-          echo "AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
-          echo "AWS_REGION=${{ secrets.AWS_REGION }}"
-          echo "IMAGE_TAG=${IMAGE_TAG}"
-          
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest
+          # Build for both amd64 and arm64
+          docker buildx build --platform linux/amd64,linux/arm64 \
+          -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:$IMAGE_TAG \
+          -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:latest \
+          --push .
 
-      # Step 7: Update ECS task definition
+      # Step 6: Update ECS task definition
       - name: Update ECS task definition
         run: |
           sed -i 's|442474044593.dkr.ecr.us-east-1.amazonaws.com/expenses-tracker:latest|${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/expenses-tracker:${{ github.sha }}|' ecs/task-def.json
 
-      # Step 8: Register ECS task definition
+      # Step 7: Register ECS task definition
       - name: Register ECS task definition
         run: |
           aws ecs register-task-definition --cli-input-json file://ecs/task-def.json
 
-      # Step 9: Deploy ECS service
+      # Step 8: Deploy ECS service
       - name: Deploy ECS service
         run: |
           aws ecs update-service --cluster expenses-tracker-cluster-2 --service expenses-tracker-service --force-new-deployment
