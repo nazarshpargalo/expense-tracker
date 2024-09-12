@@ -23,7 +23,7 @@
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
-            "awslogs-group": "/ecs/expenses-tracker-logs",
+            "awslogs-group": "/ecs/exepenses-tracker-logs",
             "awslogs-region": "us-east-1",
             "awslogs-stream-prefix": "ecs"
           }
@@ -68,3 +68,4 @@
     "memory": "1024"
   }
   
+  /ecs/expenses-tracker-logs
