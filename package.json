@@ -28,6 +28,8 @@
     "@nestjs/graphql": "~12.2.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "~10.0.2",
+    "cheerio": "~1.0.0",
+    "fs": "~0.0.1-security",
     "graphql": "~16.9.0",
     "pg": "~8.12.0",
     "reflect-metadata": "^0.1.13",
