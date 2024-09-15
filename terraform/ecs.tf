@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
   cpu                      = "512"
   memory                   = "1024"
 
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn # Add this line
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -26,11 +26,20 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
       }]
       environment = [
         { name = "DATABASE_HOST", value = "postgres" },
+        { name = "DATABASE_PORT", value = "5432" },
         { name = "DATABASE_USERNAME", value = var.db_username },
         { name = "DATABASE_PASSWORD", value = var.db_password },
         { name = "DATABASE_NAME", value = var.db_name },
         { name = "PORT", value = "3000" }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.expense_tracker_log_group.name
+          awslogs-region        = "us-east-1" # Assuming you have a variable for the AWS region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     },
     {
       name      = "postgres"
