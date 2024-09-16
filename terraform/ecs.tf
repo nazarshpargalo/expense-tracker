@@ -46,6 +46,13 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
       cpu       = 256
       memory    = 512
       essential = true
+      healthCheck = {
+        command     = ["CMD-SHELL", "pg_isready -U ${var.db_username}"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
       portMappings = [{
         containerPort = 5432
         hostPort      = 5432

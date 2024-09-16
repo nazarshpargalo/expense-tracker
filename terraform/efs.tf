@@ -20,5 +20,5 @@ resource "aws_efs_mount_target" "expense_tracker_mount_target" {
 
   file_system_id  = aws_efs_file_system.expense_tracker_fs.id
   subnet_id       = each.value
-  security_groups = [aws_security_group.expense_tracker_efs_sg.id] # Reference the EFS security group from security_groups.tf
+  security_groups = [aws_security_group.expense_tracker_efs_sg.id]
 }
