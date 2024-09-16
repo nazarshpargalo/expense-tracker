@@ -46,3 +46,28 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# EFS Security Group for Expense Tracker allowing NFS traffic on port 2049
+resource "aws_security_group" "expense_tracker_efs_sg" {
+  name        = "expense-tracker-efs-sg"
+  description = "Allow inbound NFS traffic for EFS used by Expense Tracker"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] # Adjust to your VPC CIDR range if necessary
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "expense-tracker-efs-sg"
+  }
+}

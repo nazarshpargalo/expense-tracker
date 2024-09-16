@@ -3,7 +3,6 @@ resource "aws_ecs_cluster" "expense_tracker_cluster" {
   name = "expense-tracker-cluster"
 }
 
-# ECS Task Definition for Expense Tracker
 resource "aws_ecs_task_definition" "expense_tracker_task" {
   family                   = "expense-tracker-task"
   network_mode             = "awsvpc"
@@ -36,7 +35,7 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.expense_tracker_log_group.name
-          awslogs-region        = "us-east-1" # Assuming you have a variable for the AWS region
+          awslogs-region        = "us-east-1"
           awslogs-stream-prefix = "ecs"
         }
       }
@@ -56,6 +55,13 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
         { name = "POSTGRES_PASSWORD", value = var.db_password },
         { name = "POSTGRES_DB", value = var.db_name }
       ]
+      # Volume mount for PostgreSQL data
+      mountPoints = [
+        {
+          sourceVolume  = "expense-tracker-postgres-data"
+          containerPath = "/var/lib/postgresql/data"
+        }
+      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -66,4 +72,12 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
       }
     }
   ])
+
+  # Define volumes (plural) for the task
+  volume {
+    name = "expense-tracker-postgres-data"
+    efs_volume_configuration {
+      file_system_id = aws_efs_file_system.expense_tracker_fs.id
+    }
+  }
 }
