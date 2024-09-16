@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
   console.log('test log 2');
 
   console.log({
@@ -13,6 +11,7 @@ async function bootstrap() {
     username: process.env.DATABASE_USERNAME,
     db_name: process.env.DATABASE_NAME,
   });
+  const app = await NestFactory.create(AppModule);
 
   await app.listen(3000);
 }
