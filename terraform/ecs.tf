@@ -56,6 +56,14 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
         { name = "POSTGRES_PASSWORD", value = var.db_password },
         { name = "POSTGRES_DB", value = var.db_name }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.expense_tracker_log_group.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "postgres"
+        }
+      }
     }
   ])
 }

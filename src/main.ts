@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  console.log('test log 3');
+  console.log('test log 4');
 
   console.log({
     port: process.env.DATABASE_PORT,
