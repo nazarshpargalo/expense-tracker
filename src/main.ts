@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  console.log('test log');
+  console.log('test log 1');
 
   console.log({
     port: process.env.DATABASE_PORT,
