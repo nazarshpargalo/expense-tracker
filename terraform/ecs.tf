@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
         hostPort      = 3000
       }]
       environment = [
-        { name = "DATABASE_HOST", value = "postgres" },
+        { name = "DATABASE_HOST", value = aws_db_instance.expense_tracker_rds.address },
         { name = "DATABASE_PORT", value = "5432" },
         { name = "DATABASE_USERNAME", value = var.db_username },
         { name = "DATABASE_PASSWORD", value = var.db_password },
@@ -39,53 +39,6 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
           awslogs-stream-prefix = "ecs"
         }
       }
-    },
-    {
-      name      = "postgres"
-      image     = "postgres:14.1"
-      cpu       = 256
-      memory    = 512
-      essential = true
-      healthCheck = {
-        command     = ["CMD-SHELL", "pg_isready -U ${var.db_username}"]
-        interval    = 30
-        timeout     = 5
-        retries     = 3
-        startPeriod = 60
-      }
-      portMappings = [{
-        containerPort = 5432
-        hostPort      = 5432
-      }]
-      environment = [
-        { name = "POSTGRES_USER", value = var.db_username },
-        { name = "POSTGRES_PASSWORD", value = var.db_password },
-        { name = "POSTGRES_DB", value = var.db_name },
-        { name = "POSTGRES_FSYNC", value = "on" }
-      ]
-      # Volume mount for PostgreSQL data
-      mountPoints = [
-        {
-          sourceVolume  = "expense-tracker-postgres-data"
-          containerPath = "/var/lib/postgresql/data"
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.expense_tracker_log_group.name
-          awslogs-region        = "us-east-1"
-          awslogs-stream-prefix = "postgres"
-        }
-      }
     }
   ])
-
-  # Define volumes (plural) for the task
-  volume {
-    name = "expense-tracker-postgres-data"
-    efs_volume_configuration {
-      file_system_id = aws_efs_file_system.expense_tracker_fs.id
-    }
-  }
 }
