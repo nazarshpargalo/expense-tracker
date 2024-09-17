@@ -60,7 +60,8 @@ resource "aws_ecs_task_definition" "expense_tracker_task" {
       environment = [
         { name = "POSTGRES_USER", value = var.db_username },
         { name = "POSTGRES_PASSWORD", value = var.db_password },
-        { name = "POSTGRES_DB", value = var.db_name }
+        { name = "POSTGRES_DB", value = var.db_name },
+        { name = "POSTGRES_FSYNC", value = "on" }
       ]
       # Volume mount for PostgreSQL data
       mountPoints = [
